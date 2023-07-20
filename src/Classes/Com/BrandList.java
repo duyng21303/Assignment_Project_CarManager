@@ -5,16 +5,15 @@
 package Classes.Com;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
@@ -22,7 +21,7 @@ import java.util.StringTokenizer;
  *
  * @author NguyenDuy
  */
-public class BrandList extends Brand {
+public class BrandList extends Brand{
 
     private ArrayList<Brand> arr;
     private Input ip;
@@ -36,6 +35,55 @@ public class BrandList extends Brand {
         return arr;
     }
 
+//    public boolean loadFromFile(String fBrand) {
+//        try {
+//            //check file exists
+//            File f = new File("Xbrands.txt");
+//            if (!f.exists()) {
+//                return false;
+//            }
+//            //read file
+//            FileInputStream fis = new FileInputStream(f);
+//            InputStreamReader isr = new InputStreamReader(fis);
+//            BufferedReader bf = new BufferedReader(isr);
+//            if (f.length() == 0) {
+//                System.out.println("File is empty");
+//                addBrand();
+//            }
+//            String details;
+//            while ((details = bf.readLine()) != null) {
+//                //get each element separated by ","
+//                StringTokenizer stk = new StringTokenizer(details, "[,:]");
+//                if (stk.countTokens() < 4) {
+//                    System.out.println("Have wrong format in file, it will be effect data");
+//                    return false;
+//                }
+//                //from the elements assigned to the field
+//                String brandID = stk.nextToken().trim();
+//                String brandName = stk.nextToken().trim();
+//                String soundBrand = stk.nextToken().trim();
+//                double price = Double.parseDouble(stk.nextToken());
+//                arr.add(new Brand(brandID, brandName, soundBrand, price));
+//            }
+//            //close file
+//            bf.close();
+//            fis.close();
+//            isr.close();
+//        } catch (FileNotFoundException e) {
+//            // log error or throw exception
+//            System.err.println("File not found: " + fBrand);
+//            return false;
+//        } catch (IOException e) {
+//            // log error or throw exception
+//            System.err.println("Error reading from file: " + fBrand);
+//            return false;
+//        } catch (NumberFormatException e) {
+//            // log error or throw exception
+//            System.err.println("Error parsing double value from input: " + e.getMessage());
+//            return false;
+//        }
+//        return  true;
+//    }
     public boolean loadFromFile(String fBrand) {
         try {
             //check file exists
@@ -45,38 +93,29 @@ public class BrandList extends Brand {
             }
             //read file
             FileInputStream fis = new FileInputStream(f);
-            InputStreamReader isr = new InputStreamReader(fis);
-            BufferedReader bf = new BufferedReader(isr);
+            ObjectInputStream oi = new ObjectInputStream(fis);
             if (f.length() == 0) {
-                System.out.println("File is empty");
+                System.err.println("File is empty");
                 addBrand();
             }
-            String details;
-            while ((details = bf.readLine()) != null) {
-                //get each element separated by ","
-                StringTokenizer stk = new StringTokenizer(details, "[,:]");
-                if (stk.countTokens() < 4) {
-                    System.out.println("Have wrong format in file, it will be effect data");
-                    return false;
+            boolean check = true;
+            while (check) {
+                try {
+                    Brand b = (Brand) oi.readObject();
+                    arr.add(b);
+                } catch (EOFException e) {
+                    break;
                 }
-                //from the elements assigned to the field
-                String brandID = stk.nextToken().trim();
-                String brandName = stk.nextToken().trim();
-                String soundBrand = stk.nextToken().trim();
-                double price = Double.parseDouble(stk.nextToken());
-                arr.add(new Brand(brandID, brandName, soundBrand, price));
             }
-            //close file
-            bf.close();
             fis.close();
-            isr.close();
+            oi.close();
         } catch (FileNotFoundException e) {
             // log error or throw exception
             System.err.println("File not found: " + fBrand);
             return false;
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             // log error or throw exception
-            System.err.println("Error reading from file: " + fBrand);
+            System.err.println("Error reading from file: " + fBrand + e);
             return false;
         } catch (NumberFormatException e) {
             // log error or throw exception
@@ -88,13 +127,14 @@ public class BrandList extends Brand {
 
     public boolean saveToFile(String fBrand) {
         try {
-            FileOutputStream fos = new FileOutputStream(fBrand);
-            OutputStreamWriter osw = new OutputStreamWriter(fos);
-            BufferedWriter bw = new BufferedWriter(osw); // Turn on continue recording mode
+            File f = new File(fBrand);
+            FileOutputStream fos = new FileOutputStream(f);
+            ObjectOutputStream o = new ObjectOutputStream(fos);
             for (Brand brand : arr) {
-                bw.write(brand.getBrandID() + ", " + brand.getBrandName() + ", " + brand.getSoundBrand() + ": " + brand.getPrice() + "\n"); // Write brand information to the file
+                o.writeObject(brand);
             }
-            bw.close();
+            fos.close();
+            o.close();
             System.out.println("Save successfull!");
             return true; // Indicates a successful save
         } catch (IOException e) {

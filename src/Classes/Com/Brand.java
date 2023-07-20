@@ -4,11 +4,13 @@
  */
 package Classes.Com;
 
+import java.io.Serializable;
+
 /**
  *
  * @author NguyenDuy
  */
-public class Brand {
+public class Brand implements Serializable{
     private String brandID;
     private String brandName;
     private String soundBrand;

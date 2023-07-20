@@ -4,11 +4,13 @@
  */
 package Classes.Com;
 
+import java.io.Serializable;
+
 /**
  *
  * @author NguyenDuy
  */
-public class Car implements Comparable<Car> {
+public class Car implements Comparable<Car>, Serializable {
 
     private String carID;
     protected Brand brand;

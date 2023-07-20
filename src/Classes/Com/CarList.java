@@ -5,16 +5,15 @@
 package Classes.Com;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.StringTokenizer;
@@ -23,7 +22,7 @@ import java.util.StringTokenizer;
  *
  * @author NguyenDuy
  */
-public class CarList extends Car {
+public class CarList extends Car{
 
     private ArrayList<Car> arr;
     private Input ip;
@@ -37,6 +36,68 @@ public class CarList extends Car {
         menu = new Menu();
     }
 
+//    public boolean loadFromFile(String fCar) {
+//        try {
+//            //check file exists
+//            File f = new File(fCar);
+//            if (!f.exists()) {
+//                return false;
+//            }
+//            //read file
+//            FileInputStream fis = new FileInputStream(f);
+//            InputStreamReader isr = new InputStreamReader(fis);
+//            BufferedReader bf = new BufferedReader(isr);
+//            if (f.length() == 0) {
+//                System.out.println("File is empty");
+//                addCar();
+//            }
+//            String details;
+//            int count = 0;
+//            while ((details = bf.readLine()) != null) {
+//                //get each element separated by ","
+//                StringTokenizer stk = new StringTokenizer(details, ",");
+//                if (stk.countTokens() < 5) {
+//                    System.out.println("Have wrong format in file, it will be effect data");
+//                    return false;
+//                }
+//                //from the elements assigned to the field
+//                String carID = stk.nextToken().trim();
+//                String brandID = stk.nextToken().trim();
+//                String color = stk.nextToken().trim();
+//                String frameID = stk.nextToken().trim();
+//                String engineID = stk.nextToken().trim();
+//                Brand brands = ip.searchBrandID(brandList, brandID);
+//                //Check null brand
+//                if (brands != null) {
+//                    arr.add(new Car(carID, brands, color, frameID, engineID));
+//                } else {
+//                    count++;
+//                    arr.add(new Car(carID, new Brand("Empty", "Empty", "Empty", 0), color, frameID, engineID));
+//                }
+//            }
+//            //Error null brands 
+//            if (count > 0){
+//                System.out.println("Have " + count + " null brand when load file!");
+//            }
+//            //close file
+//            bf.close();
+//            fis.close();
+//            isr.close();
+//        } catch (FileNotFoundException e) {
+//            // log error or throw exception
+//            System.err.println("File not found: " + fCar);
+//            return false;
+//        } catch (IOException e) {
+//            // log error or throw exception
+//            System.err.println("Error reading from file: " + fCar);
+//            return false;
+//        } catch (NumberFormatException e) {
+//            // log error or throw exception
+//            System.err.println("Error parsing double value from input: " + e.getMessage());
+//            return false;
+//        }
+//        return true;
+//    }
     public boolean loadFromFile(String fCar) {
         try {
             //check file exists
@@ -46,51 +107,29 @@ public class CarList extends Car {
             }
             //read file
             FileInputStream fis = new FileInputStream(f);
-            InputStreamReader isr = new InputStreamReader(fis);
-            BufferedReader bf = new BufferedReader(isr);
+            ObjectInputStream oi = new ObjectInputStream(fis);
             if (f.length() == 0) {
-                System.out.println("File is empty");
+                System.err.println("File is empty");
                 addCar();
             }
-            String details;
-            int count = 0;
-            while ((details = bf.readLine()) != null) {
-                //get each element separated by ","
-                StringTokenizer stk = new StringTokenizer(details, ",");
-                if (stk.countTokens() < 5) {
-                    System.out.println("Have wrong format in file, it will be effect data");
-                    return false;
-                }
-                //from the elements assigned to the field
-                String carID = stk.nextToken().trim();
-                String brandID = stk.nextToken().trim();
-                String color = stk.nextToken().trim();
-                String frameID = stk.nextToken().trim();
-                String engineID = stk.nextToken().trim();
-                Brand brands = ip.searchBrandID(brandList, brandID);
-                //Check null brand
-                if (brands != null) {
-                    arr.add(new Car(carID, brands, color, frameID, engineID));
-                } else {
-                    count++;
-                    arr.add(new Car(carID, new Brand("Empty", "Empty", "Empty", 0), color, frameID, engineID));
+            boolean check = true;
+            while (check) {
+                try {
+                    Car c = (Car) oi.readObject();
+                    arr.add(c);
+                } catch (EOFException e) {
+                    break;
                 }
             }
-            //Error null brands 
-            if (count > 0){
-                System.out.println("Have " + count + " null brand when load file!");
-            }
-            //close file
-            bf.close();
             fis.close();
-            isr.close();
+            oi.close();
         } catch (FileNotFoundException e) {
             // log error or throw exception
             System.err.println("File not found: " + fCar);
             return false;
-        } catch (IOException e) {
+        } catch (IOException| ClassNotFoundException e) {
             // log error or throw exception
-            System.err.println("Error reading from file: " + fCar);
+            System.err.println("Error reading from file: " + fCar + e);
             return false;
         } catch (NumberFormatException e) {
             // log error or throw exception
@@ -102,13 +141,14 @@ public class CarList extends Car {
 
     public boolean saveToFile(String fCar) {
         try {
-            FileOutputStream fos = new FileOutputStream(fCar);
-            OutputStreamWriter osw = new OutputStreamWriter(fos);
-            BufferedWriter bw = new BufferedWriter(osw); // Turn on continue recording mode
+            File f = new File(fCar);
+            FileOutputStream fos = new FileOutputStream(f);
+            ObjectOutputStream o = new ObjectOutputStream(fos);
             for (Car car : arr) {
-                bw.write(car.getCarID() + ", " + car.getBrand().getBrandID() + ", " + car.getColor() + ", " + car.getFrameID() + ", " + car.getEngineID() + "\n"); // Write car information to the file
+                o.writeObject(car);
             }
-            bw.close();
+            fos.close();
+            o.close();
             System.out.println("Save successfull!");
             return true; // Indicates a successful save
         } catch (IOException e) {

@@ -31,7 +31,7 @@ public class Input {
                 integer = Integer.parseInt(sc.nextLine());
                 return integer;
             } catch (NumberFormatException e) {
-                System.out.println("This must be number");
+                System.err.println("This must be number");
                 cont = true;
             }
         }
@@ -56,7 +56,7 @@ public class Input {
                     return iDouble;
                 }
             } catch (NumberFormatException e) {
-                System.out.println("This must be number");
+                System.err.println("This must be number");
                 cont = true;
             }
         }
@@ -133,9 +133,9 @@ public class Input {
             System.out.println("Enter brand id: ");
             id = sc.nextLine();
             if (searchBrandID(arr, id) != null) {
-                System.out.println("Duplicated code.Try with another one");
+                System.err.println("Duplicated code.Try with another one");
             } else if (id.trim().isEmpty()) {
-                System.out.println("ID can't not empty!");
+                System.err.println("ID can't not empty!");
             } else {
                 return id.toUpperCase();
             }
@@ -170,7 +170,7 @@ public class Input {
             } else if (choice.equalsIgnoreCase("N")) {
                 return false;
             } else {
-                System.out.println("Must be Y or N");
+                System.err.println("Must be Y or N");
                 continue;
             }
         }
@@ -187,9 +187,9 @@ public class Input {
             System.out.println("Enter car id: ");
             id = sc.nextLine();
             if (searchCarID(arr, id) != null) {
-                System.out.println("Duplicated ID.Try with another one");
+                System.err.println("Duplicated ID.Try with another one");
             } else if (id.trim().isEmpty()) {
-                System.out.println("ID can't not empty!");
+                System.err.println("ID can't not empty!");
             } else {
                 return id.toUpperCase();
             }
@@ -205,9 +205,9 @@ public class Input {
         do {
             id = inputPattern(msg, "^[fF]\\d{5}$");
             if (searchFrameID(arr, id) != null) {
-                System.out.println("Duplicated ID.Try with another one");
+                System.err.println("Duplicated ID.Try with another one");
             } else if (id.trim().isEmpty()) {
-                System.out.println("ID can't not empty!");
+                System.err.println("ID can't not empty!");
             } else {
                 return id.toUpperCase();
             }
@@ -223,9 +223,9 @@ public class Input {
         do {
             id = inputPattern(msg, "^[eE]\\d{5}$");
             if (searchEngineID(arr, id) != null) {
-                System.out.println("Duplicated ID.Try with another one");
+                System.err.println("Duplicated ID.Try with another one");
             } else if (id.trim().isEmpty()) {
-                System.out.println("ID can't not empty!");
+                System.err.println("ID can't not empty!");
             } else {
                 return id.toUpperCase();
             }

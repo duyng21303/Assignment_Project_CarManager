@@ -18,9 +18,9 @@ public class CarManager {
     public static void main(String[] args) {
         ArrayList<String> ops = new ArrayList<>();
         BrandList bl = new BrandList();
-        bl.loadFromFile("brands.txt");
+        bl.loadFromFile("brands.dat");
         CarList cl = new CarList(bl);
-        cl.loadFromFile("cars.txt");
+        cl.loadFromFile("cars.dat");
         Menu menu = new Menu();
         int choice;
         ops.add("List all brands");
@@ -51,7 +51,7 @@ public class CarManager {
                     bl.updateBrand();
                     break;
                 case 5:
-                    bl.saveToFile("brands.txt");
+                    bl.saveToFile("brands.dat");
                     break;
                 case 6:
                     cl.listCars();
@@ -69,7 +69,7 @@ public class CarManager {
                     cl.updateCar();
                     break;
                 case 11:
-                    cl.saveToFile("cars.txt");
+                    cl.saveToFile("cars.dat");
                     break;
                 default:
                     System.out.println("Bye!");
